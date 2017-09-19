@@ -15,7 +15,7 @@ class CreateTopicsTable extends Migration
     {
         // update users
         Schema::table('users', function (Blueprint $table) {
-            $table->char('slug', 255);
+            $table->char('slug', 255)->nullable();
             $table->boolean('active')->default(true);
         });
 
