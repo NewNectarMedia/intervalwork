@@ -14,7 +14,17 @@
                         </div>
                     @endif
 
-                    You are logged in!
+                    <p>User actions:<br />
+                    INITIAL SETUP | PREFERENCES</p>
+
+                    <p>To do:</p>
+                    <ul>
+                    <li>Setup tables</li>
+                    <li>Create models</li>
+                    <li>Integrate Twilio</li>
+                    <li>Create views</li>
+                    <li>Integrate Google Calendar</li>
+                    </ul>
                 </div>
             </div>
         </div>

@@ -23,3 +23,13 @@ Route::get('/home', 'HomeController@index')->name('home');
 //     // Only authenticated users may enter...
 // })->middleware('auth');
 
+Route::match(array('GET', 'POST'), '/incoming', function()
+{
+  //$xml = '<Response><Say>Hello - your app just answered the phone. Neat, eh?</Say></Response>';
+  
+  $twiml = new Services_Twilio_Twiml();
+  $twiml->say('Hello - your app just answered the phone. Neat, eh?', array('voice' => 'alice'));
+  $response = Response::make($twiml, 200);
+  $response->header('Content-Type', 'text/xml');
+  return $response;
+});
