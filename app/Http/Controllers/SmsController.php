@@ -77,7 +77,7 @@ class SmsController extends Controller
         $new_user->slug = uniqid();
         $new_user->save();
 
-        if($new_user){
+        if($new_user->id){
             $phone = new Phone;
             $phone->phone = $phone;
             $phone->user_id = $new_user->id;
@@ -109,17 +109,17 @@ class SmsController extends Controller
 
         $response = "";
 
-        if (filter_var($body, FILTER_VALIDATE_EMAIL)) {$response = "You're in! Text a topic or the word 'schedule' to list today's topics.";
+        if (filter_var($body, FILTER_VALIDATE_EMAIL)) {
             // we are getting an email
             // check if this email is already in the user table
             // if not create a new user and send confirmation
-            // if(count(User::where('email','=',$body)->first()) == 0){
-            //     if($this->createNewAccount($body, $from)){
-            //         $response = "You're in! Text a topic or the word 'schedule' to list today's topics.";
-            //     }else{
-            //         exit;
-            //     }
-            // }   
+            if(User::where('email','=',$body)->count() == 0){
+                if($this->createNewAccount($body, $from)){
+                    $response = "You're in! Text a topic or the word 'schedule' to list today's topics.";
+                }else{
+                    exit;
+                }
+            }   
             // if already there, proceed further as it may be a topic
         }
 
