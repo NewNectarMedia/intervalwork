@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Auth;
 use Session;
 use App\User;
+use App\Phone;
 use App\Topic;
 use App\Repetition;
 
@@ -37,8 +38,6 @@ class SmsController extends Controller
         $number = getenv('TWILIO_NUMBER');
         $client = new \Twilio\Rest\Client($sid, $token);
 
-        $user = Auth::user();
-
         // Use the client to do fun stuff like send text messages!
     /*    $client->messages->create(
             // the number you'd like to send the message to
@@ -57,10 +56,7 @@ class SmsController extends Controller
             exit;
         }
 
-        $phone = User::whereHas("phones", function($q){
-                            $q->where("phone", "=", $request['From']);
-                        })
-                        ->get();
+        $phone = Phone::where("phone", "=", $request['From'])->first();
 
         if(count($phone) == 0){
             exit;
@@ -102,9 +98,10 @@ class SmsController extends Controller
             */
         }else{
             $topic = new Topic([
-                'name' => $user->id,
-                'user_id' => $user->id
+                'name' => $body,
+                'user_id' => $phone->user_id
             ]);
+            $topic->save();
 
             $repetitions = array();
             $repetitions[] = date('Y-m-d'); // get today's date
@@ -116,10 +113,11 @@ class SmsController extends Controller
             foreach($repetitions as $rep){
                 $repetition = new Repetition([
                     'topic_id' => $topic->id,
-                    'user_id' => $user->id,
+                    'user_id' => $phone->user_id,
                     'when' => $rep,
                     'timezone' => 'America/Los_Angeles'
                 ]);
+                $repetition->save();
             }
 
             $response = "Roger - topics added to calendar. Text 'schedule' to view today's topics."; 
