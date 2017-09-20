@@ -18,3 +18,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::match(array('GET', 'POST'), '/incoming', 'SmsController@processIncomingMessage');
+
+Route::get('/ical/{slug}', 'CalendarController@exportiCal')->name('iCal');

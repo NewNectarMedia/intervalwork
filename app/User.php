@@ -41,4 +41,9 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Preference', 'user_id', 'id');
     }
+
+    public function repetitions()
+    {
+        return $this->hasMany('App\Repetition', 'user_id', 'id')->orderBy('when', 'ASC');
+    }
 }
