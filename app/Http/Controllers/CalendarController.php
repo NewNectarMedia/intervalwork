@@ -51,8 +51,9 @@ class CalendarController extends Controller
             $output .= "UID:intervalwork".$user->slug.$event->id."\n";
             $output .= "STATUS:CONFIRMED\n";
             $output .= "DTSTAMP:" . date(DATE_ICAL, strtotime($event->when)) . "\n";
-            $output .= "DTSTART:" . date(DATE_ICAL, strtotime($event->when)) . "\n";
-            $output .= "DTEND:" . date(DATE_ICAL, strtotime($event->when)) . "\n";
+            //$output .= "DTSTART:" . date(DATE_ICAL, strtotime($event->when)) . "\n";
+            //$output .= "DTEND:" . date(DATE_ICAL, strtotime($event->when)) . "\n";
+            $output .= "DATE:" . date(DATE_ICAL, strtotime($event->when)) . "\n";
             $output .= "LAST-MODIFIED:" . date(DATE_ICAL, strtotime($event->when)) . "\n";
             //$output .= "LOCATION:N/A\n";
             $output .= "END:VEVENT\n";
