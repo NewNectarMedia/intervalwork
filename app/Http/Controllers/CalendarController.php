@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Auth;
 use Session;
 use App\User;
@@ -62,7 +63,7 @@ class CalendarController extends Controller
         // close calendar
         $output .= "END:VCALENDAR";
          
-        return $output;
+        return response($output)->header('Content-Type', 'text/calendar');
     }
 }
 
