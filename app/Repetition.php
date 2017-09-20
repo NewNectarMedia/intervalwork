@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Repetition extends Model
 {
-    protected $fillable = ['when', 'user_id'];
+    protected $fillable = ['when', 'user_id', 'timezone'];
     public $timestamps = false;
 
     public function user()

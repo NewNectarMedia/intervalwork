@@ -17,14 +17,11 @@
                     <p>User actions:<br />
                     INITIAL SETUP | PREFERENCES</p>
 
-                    <p>To do:</p>
-                    <ul>
-                    <li>Setup tables</li>
-                    <li>Create models</li>
-                    <li>Integrate Twilio</li>
-                    <li>Create views</li>
-                    <li>Integrate Google Calendar</li>
-                    </ul>
+                    @if($user->phones)
+                    @foreach($user->phones as $phone)
+                    {{$phone->name}} - {{$phone->phone}}<br />
+                    @endforeach
+                    @endif
                 </div>
             </div>
         </div>

@@ -52,7 +52,8 @@ class CreateTopicsTable extends Migration
             $table->unsignedInteger('user_id')->nullable();
             $table->unsignedInteger('topic_id')->nullable();
             $table->dateTime('when')->nullable(); // date
-
+            $table->string('timezone');
+            
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
@@ -70,6 +71,7 @@ class CreateTopicsTable extends Migration
             $table->string('language')->nullable();
             $table->string('pattern')->nullable();
             $table->boolean('use_calendar')->default(false);
+            $table->string('timezone')->nullable();
 
             $table->foreign('user_id')
                 ->references('id')

@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Auth;
+use Session;
+use App\User;
+use App\Topic;
+use App\Repetition;
 
 class SmsController extends Controller
 {
@@ -32,6 +37,8 @@ class SmsController extends Controller
         $number = getenv('TWILIO_NUMBER');
         $client = new \Twilio\Rest\Client($sid, $token);
 
+        $user = Auth::user();
+
         // Use the client to do fun stuff like send text messages!
     /*    $client->messages->create(
             // the number you'd like to send the message to
@@ -45,35 +52,27 @@ class SmsController extends Controller
         );
     */
 
-        $repetitions = array();
-        $repetitions[] = date('Y-m-d'); // get today's date
-        $repetitions[] = date("Y-m-d", strtotime("+2 weekdays")); // rep 1
-        $repetitions[] = date("Y-m-d", strtotime("+10 weekdays")); // rep 2
-        $repetitions[] = date("Y-m-d", strtotime("+20 weekdays")); // rep 3
-        $repetitions[] = date("Y-m-d", strtotime("+40 weekdays")); // rep 4
-
-        // make an associative array of senders we know, indexed by phone number
-        // twillio number: $number 
-        $people = array(
-            "+16198823517"=>"Dad",
-            "+17068777561"=>"Erika",
-            "+13038083698"=>"Dad",
-        );
-
-        // if the sender is known, then greet them by name
-        // otherwise, consider them just another monkey
-        if(!array_key_exists($request['From'], $people)) {
+        // get the phone information if it exists
+        if(empty($request['From'])){
             exit;
         }
 
-        $name = $people[$request['From']];
-        
+        $phone = User::whereHas("phones", function($q){
+                            $q->where("phone", "=", $request['From']);
+                        })
+                        ->get();
+
+        if(count($phone) == 0){
+            exit;
+        }
+
         $body = $request['Body'];
-        //$response = "Thanks for the message ".$name;
-        $response = "Roger - topics added to calendar. Text 'schedule' to view today's topics.";
+        if($body == '' || $body == null){
+            exit;
+        }
 
         if($body == "schedule" || $body == "Schedule"){
-     /*       $response = "";
+            /*       $response = "";
 
             $optParams = array(
               'maxResults' => 20,
@@ -102,45 +101,28 @@ class SmsController extends Controller
             //$response = "Today's schedule... TBD";
             */
         }else{
-          $i = 1;
-            foreach($repetitions as $rep){
-                /*
-                $event = new Google_Service_Calendar_Event(array(
-                  'summary' => $body." (".$i.")",
-                  'location' => '',
-                  'description' => '',
-                  'start' => array(
-                    'date' => $rep,
-                    'timeZone' => 'America/Los_Angeles',
-                  ),
-                  'end' => array(
-                    'date' => $rep,
-                    'timeZone' => 'America/Los_Angeles',
-                  ),
-                  'attendees' => array(
-                    array('email' => 'p@newnectar.com'),
-                  ),
-                  'reminders' => array(
-                    'useDefault' => FALSE,
-                    'overrides' => array(
-                      array('method' => 'email', 'minutes' => 24 * 60),
-                      array('method' => 'popup', 'minutes' => 10),
-                    ),
-                  ),
-                ));
-                */
-                //'dateTime' => '2017-06-28T17:00:00-07:00',
-                //,
-                //  'recurrence' => array(
-                //    'RRULE:FREQ=DAILY;COUNT=2'
-                //  )
+            $topic = new Topic([
+                'name' => $user->id,
+                'user_id' => $user->id
+            ]);
 
-                //$event = $service->events->insert($calendarId, $event);
-                
-                
-                $i++;
+            $repetitions = array();
+            $repetitions[] = date('Y-m-d'); // get today's date
+            $repetitions[] = date("Y-m-d", strtotime("+2 weekdays")); // rep 1
+            $repetitions[] = date("Y-m-d", strtotime("+10 weekdays")); // rep 2
+            $repetitions[] = date("Y-m-d", strtotime("+20 weekdays")); // rep 3
+            $repetitions[] = date("Y-m-d", strtotime("+40 weekdays")); // rep 4
+
+            foreach($repetitions as $rep){
+                $repetition = new Repetition([
+                    'topic_id' => $topic->id,
+                    'user_id' => $user->id,
+                    'when' => $rep,
+                    'timezone' => 'America/Los_Angeles'
+                ]);
             }
-            
+
+            $response = "Roger - topics added to calendar. Text 'schedule' to view today's topics."; 
         }
 
         header("content-type: text/xml");
