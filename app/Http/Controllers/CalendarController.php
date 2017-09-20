@@ -48,7 +48,7 @@ class CalendarController extends Controller
         foreach ($events as $event):
             $output .= "BEGIN:VEVENT\n";
             $output .= "SUMMARY:".$event->topic->name."\n";
-            $output .= "UID:".$event->id."\n";
+            $output .= "UID:intervalwork".$user->slug.$event->id."\n";
             $output .= "STATUS:CONFIRMED\n";
             $output .= "DTSTAMP:" . date(DATE_ICAL, strtotime($event->when)) . "\n";
             $output .= "DTSTART:" . date(DATE_ICAL, strtotime($event->when)) . "\n";
