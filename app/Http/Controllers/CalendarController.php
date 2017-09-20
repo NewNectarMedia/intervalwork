@@ -36,7 +36,7 @@ class CalendarController extends Controller
         }
 
         // the iCal date format. Note the Z on the end indicates a UTC timestamp.
-        define('DATE_ICAL', 'Ymd\THis\Z');
+        define('DATE_ICAL', 'Ymd\THis');
          
         // max line length is 75 chars. New line is \\n
         $output = "BEGIN:VCALENDAR\n";
@@ -54,7 +54,7 @@ class CalendarController extends Controller
             $output .= "DTSTART:" . date(DATE_ICAL, strtotime($event->when)) . "\n";
             $output .= "DTEND:" . date(DATE_ICAL, strtotime($event->when)) . "\n";
             $output .= "LAST-MODIFIED:" . date(DATE_ICAL, strtotime($event->when)) . "\n";
-            $output .= "LOCATION:N/A\n";
+            //$output .= "LOCATION:N/A\n";
             $output .= "END:VEVENT\n";
         endforeach;
          
