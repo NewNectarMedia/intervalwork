@@ -77,13 +77,13 @@ class SmsController extends Controller
         $new_user->slug = uniqid();
         $new_user->save();
 
-        if($new_user->id){
-            $phone = new Phone;
-            $phone->phone = $phone;
-            $phone->user_id = $new_user->id;
-            $phone->save();
+        if($new_user->id > 0){
+            $new_phone = new Phone;
+            $new_phone->phone = $phone;
+            $new_phone->user_id = $new_user->id;
+            $new_phone->save();
 
-            if($phone){ return 1;}else{return null;}
+            if($new_phone->id){ return 1;}else{return null;}
         }else{
             return null;
         }
@@ -117,61 +117,61 @@ class SmsController extends Controller
                 if($this->createNewAccount($body, $from)){
                     $response = "You're in! Text a topic or the word 'schedule' to list today's topics.";
                 }else{
-                    exit;
+                    $response = "Not sure what happened...";
                 }
             }   
             // if already there, proceed further as it may be a topic
-        }
+        }else{
+            $phone = Phone::where("phone", "=", $request['From'])->first();
 
-        $phone = Phone::where("phone", "=", $request['From'])->first();
-
-        if(count($phone) == 0){
-            exit;
-        }
-
-        if($body == "schedule" || $body == "Schedule"){
-
-            $today = date('Y-m-d')." 00:00:00";
-
-            $schedule = Repetition::where('user_id','=', $phone->user_id)
-                                    ->where('when', '=', $today)
-                                    ->with('topic')
-                                    ->get();
-
-            if (count($schedule) == 0) {
-              //print "No upcoming events found.\n";
-              $response = "Nothing to work on today! ".date('Y-m-d');
-            } else {
-              //print "Upcoming events:\n";
-              foreach ($schedule as $schedule_item) {
-                $response = $response.$schedule_item->topic->name."\n";
-              }
+            if(count($phone) == 0){
+                exit;
             }
-        }elseif($response == ""){
-            $topic = new Topic([
-                'name' => $body,
-                'user_id' => $phone->user_id
-            ]);
-            $topic->save();
 
-            $repetitions = array();
-            $repetitions[] = date('Y-m-d'); // get today's date
-            $repetitions[] = date("Y-m-d", strtotime("+2 weekdays")); // rep 1
-            $repetitions[] = date("Y-m-d", strtotime("+10 weekdays")); // rep 2
-            $repetitions[] = date("Y-m-d", strtotime("+20 weekdays")); // rep 3
-            $repetitions[] = date("Y-m-d", strtotime("+40 weekdays")); // rep 4
+            if($body == "schedule" || $body == "Schedule"){
 
-            foreach($repetitions as $rep){
-                $repetition = new Repetition([
-                    'topic_id' => $topic->id,
-                    'user_id' => $phone->user_id,
-                    'when' => $rep,
-                    'timezone' => 'America/Los_Angeles'
+                $today = date('Y-m-d')." 00:00:00";
+
+                $schedule = Repetition::where('user_id','=', $phone->user_id)
+                                        ->where('when', '=', $today)
+                                        ->with('topic')
+                                        ->get();
+
+                if (count($schedule) == 0) {
+                  //print "No upcoming events found.\n";
+                  $response = "Nothing to work on today! ".date('Y-m-d');
+                } else {
+                  //print "Upcoming events:\n";
+                  foreach ($schedule as $schedule_item) {
+                    $response = $response.$schedule_item->topic->name."\n";
+                  }
+                }
+            }elseif($response == ""){
+                $topic = new Topic([
+                    'name' => $body,
+                    'user_id' => $phone->user_id
                 ]);
-                $repetition->save();
-            }
+                $topic->save();
 
-            $response = "Roger - topics added to calendar. Text 'schedule' to view today's topics."; 
+                $repetitions = array();
+                $repetitions[] = date('Y-m-d'); // get today's date
+                $repetitions[] = date("Y-m-d", strtotime("+2 weekdays")); // rep 1
+                $repetitions[] = date("Y-m-d", strtotime("+10 weekdays")); // rep 2
+                $repetitions[] = date("Y-m-d", strtotime("+20 weekdays")); // rep 3
+                $repetitions[] = date("Y-m-d", strtotime("+40 weekdays")); // rep 4
+
+                foreach($repetitions as $rep){
+                    $repetition = new Repetition([
+                        'topic_id' => $topic->id,
+                        'user_id' => $phone->user_id,
+                        'when' => $rep,
+                        'timezone' => 'America/Los_Angeles'
+                    ]);
+                    $repetition->save();
+                }
+
+                $response = "Roger - topics added to calendar. Text 'schedule' to view today's topics."; 
+            }
         }
 
         header("content-type: text/xml");

@@ -59,7 +59,7 @@ class HomeController extends Controller
         $phone->phone = $request->phone;
         $phone->user_id = $user->id;
         $phone->save();
-
+        
         return redirect('/home');
     }
 
