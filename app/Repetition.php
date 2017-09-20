@@ -13,4 +13,9 @@ class Repetition extends Model
     {
         return $this->belongsTo('App\User');
     }
+
+    public function topic()
+    {
+        return $this->hasOne('App\Topic', 'id', 'topic_id');
+    }
 }

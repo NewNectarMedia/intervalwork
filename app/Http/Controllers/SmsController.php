@@ -38,19 +38,6 @@ class SmsController extends Controller
         $number = getenv('TWILIO_NUMBER');
         $client = new \Twilio\Rest\Client($sid, $token);
 
-        // Use the client to do fun stuff like send text messages!
-    /*    $client->messages->create(
-            // the number you'd like to send the message to
-            '+16198823517',
-            array(
-                // A Twilio phone number you purchased at twilio.com/console
-                'from' => $number,
-                // the body of the text message you'd like to send
-                'body' => 'Hey Bob! Good luck on the bar exam!'
-            )
-        );
-    */
-
         // get the phone information if it exists
         if(empty($request['From'])){
             exit;
@@ -68,34 +55,24 @@ class SmsController extends Controller
         }
 
         if($body == "schedule" || $body == "Schedule"){
-            /*       $response = "";
+            $response = "";
 
-            $optParams = array(
-              'maxResults' => 20,
-              'orderBy' => 'startTime',
-              'singleEvents' => TRUE,
-              'timeMin' => date('Y-m-d\T')."00:00:00Z",
-              'timeMax' => date('Y-m-d\T')."23:59:59Z",
-            );
-            $results = $service->events->listEvents($calendarId, $optParams);
+            $today = date('Y-m-d')." 00:00:00";
 
-            if (count($results->getItems()) == 0) {
+            $schedule = Repetition::where('user_id','=', $phone->user_id)
+                                    ->where('when', '=', $today)
+                                    ->with('topic')
+                                    ->get();
+
+            if (count($schedule) == 0) {
               //print "No upcoming events found.\n";
               $response = "Nothing to work on today! ".date('Y-m-d');
             } else {
               //print "Upcoming events:\n";
-              foreach ($results->getItems() as $event) {
-                $start = $event->start->dateTime;
-                if (empty($start)) {
-                  $start = $event->start->date;
-                }
-                //printf("%s (%s)\n", $event->getSummary(), $start);
-                $response = $response.$event->getSummary()."\n";
+              foreach ($schedule as $schedule_item) {
+                $response = $response.$schedule_item->topic->name."\n";
               }
             }
-            
-            //$response = "Today's schedule... TBD";
-            */
         }else{
             $topic = new Topic([
                 'name' => $body,
