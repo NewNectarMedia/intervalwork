@@ -22,6 +22,7 @@ class CreateTopicsTable extends Migration
         // phone numbers
         Schema::create('phones', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('name')->nullable();
             $table->string('phone')->nullable();
             $table->unsignedInteger('user_id')->nullable();
 
@@ -49,11 +50,16 @@ class CreateTopicsTable extends Migration
         Schema::create('repetitions', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id')->nullable();
+            $table->unsignedInteger('topic_id')->nullable();
             $table->dateTime('when')->nullable(); // date
 
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
+                ->onDelete('cascade');
+            $table->foreign('topic_id')
+                ->references('id')
+                ->on('topics')
                 ->onDelete('cascade');
         });
 

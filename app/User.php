@@ -15,7 +15,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'slug', 'active'
     ];
 
     /**
@@ -26,4 +26,19 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function phones()
+    {
+        return $this->hasMany('App\Phone', 'user_id', 'id');
+    }
+
+    public function topics()
+    {
+        return $this->hasMany('App\Topic', 'user_id', 'id');
+    }
+
+    public function preferences()
+    {
+        return $this->hasMany('App\Preference', 'user_id', 'id');
+    }
 }
