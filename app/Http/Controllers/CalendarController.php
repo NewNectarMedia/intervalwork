@@ -49,7 +49,7 @@ class CalendarController extends Controller
         foreach ($events as $event):
             $output .= "BEGIN:VEVENT\r\n";
             $output .= "SUMMARY:".$event->topic->name."\r\n";
-            $output .= "UID:intervalwork".$user->slug.$event->id."\r\n";
+            $output .= "UID:".md5(uniqid(mt_rand(), true)) . "@intervalwork.com\r\n";
             $output .= "STATUS:CONFIRMED\r\n";
             $output .= "DTSTAMP:" . date(DATE_ICAL, strtotime($event->when)) . "\r\n";
             $output .= "DTSTART:" . date(DATE_ICAL, strtotime($event->when)) . "\r\n";
