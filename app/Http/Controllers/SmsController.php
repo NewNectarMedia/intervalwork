@@ -31,6 +31,64 @@ class SmsController extends Controller
         return view('home');
     }
 
+    // TBD
+    // public function checkPhoneNumber($phone=null, Request $request)
+    // {
+    //     $sid = getenv('TWILIO_ACCOUNT_SID'); 
+    //     $token = getenv('TWILIO_AUTH_TOKEN');
+    //     $number = getenv('TWILIO_NUMBER');
+    //     $client = new \Twilio\Rest\Client($sid, $token);
+        
+    //     try {
+    //         $number = $client->lookups
+    //             ->phoneNumbers("226198823517")
+    //             ->fetch(
+    //                 array("countryCode" => "US", "type" => "carrier")
+    //             );
+    //         if($number){
+    //             if($number->carrier["type"] == 'mobile'){
+    //                 return 1;
+    //             }else{
+    //                 return null;
+    //             }
+    //         }else{
+    //             return null; 
+    //         }
+    //     } catch (Exception $e) {
+    //         return null; 
+    //     }
+        
+    // }
+
+    public function createNewAccount($email, $phone)
+    {
+        $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+        $pass = array(); //remember to declare $pass as an array
+        $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
+        for ($i = 0; $i < 8; $i++) {
+            $n = rand(0, $alphaLength);
+            $pass[] = $alphabet[$n];
+        }
+        $password = implode($pass);
+
+        $new_user = new User;
+        $new_user->email = $email;
+        $new_user->password = bcrypt($password);
+        $new_user->slug = uniqid();
+        $new_user->save();
+
+        if($new_user){
+            $phone = new Phone;
+            $phone->phone = $phone;
+            $phone->user_id = $new_user->id;
+            $phone->save();
+
+            if($phone){ return 1;}else{return null;}
+        }else{
+            return null;
+        }
+    }
+
     public function processIncomingMessage(Request $request)
     {
         $sid = getenv('TWILIO_ACCOUNT_SID'); 
@@ -39,8 +97,30 @@ class SmsController extends Controller
         $client = new \Twilio\Rest\Client($sid, $token);
 
         // get the phone information if it exists
-        if(empty($request['From'])){
+        $from = $request['From'];
+        if(empty($from)){
             exit;
+        }
+
+        $body = $request['Body'];
+        if(empty($body)){
+            exit;
+        }
+
+        $response = "";
+
+        if (filter_var($body, FILTER_VALIDATE_EMAIL)) {
+            // we are getting an email
+            // check if this email is already in the user table
+            // if not create a new user and send confirmation
+            if(count(User::where('email','=',$body)->first()) == 0){
+                if($this->createNewAccount($body, $from)){
+                    $response = "You're in! Text a topic or the word 'schedule' to list today's topics.";
+                }else{
+                    exit;
+                }
+            }   
+            // if already there, proceed further as it may be a topic
         }
 
         $phone = Phone::where("phone", "=", $request['From'])->first();
@@ -49,13 +129,7 @@ class SmsController extends Controller
             exit;
         }
 
-        $body = $request['Body'];
-        if($body == '' || $body == null){
-            exit;
-        }
-
         if($body == "schedule" || $body == "Schedule"){
-            $response = "";
 
             $today = date('Y-m-d')." 00:00:00";
 
@@ -73,7 +147,7 @@ class SmsController extends Controller
                 $response = $response.$schedule_item->topic->name."\n";
               }
             }
-        }else{
+        }elseif($response == ""){
             $topic = new Topic([
                 'name' => $body,
                 'user_id' => $phone->user_id
