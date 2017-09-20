@@ -52,9 +52,9 @@ class CalendarController extends Controller
             $output .= "UID:".md5(uniqid(mt_rand(), true)) . "@intervalwork.com\r\n";
             $output .= "STATUS:CONFIRMED\r\n";
             $output .= "DTSTAMP:" . date(DATE_ICAL, strtotime($event->when)) . "\r\n";
-            $output .= "DTSTART:" . date(DATE_ICAL, strtotime($event->when)) . "\r\n";
-            $output .= "DTEND:" . date(DATE_ICAL, strtotime($event->when)) . "\r\n";
-            //$output .= "DATE:" . date('Ymd', strtotime($event->when)) . "\r\n";
+            //$output .= "DTSTART:" . date(DATE_ICAL, strtotime($event->when)) . "\r\n";
+            //$output .= "DTEND:" . date(DATE_ICAL, strtotime($event->when)) . "\r\n";
+            $output .= "DTSTART;VALUE=DATE:" . date('Ymd', strtotime($event->when)) . "\r\n";
             $output .= "LAST-MODIFIED:" . date(DATE_ICAL, strtotime($event->when)) . "\r\n";
             //$output .= "LOCATION:N/A\r\n";
             $output .= "END:VEVENT\r\n";
