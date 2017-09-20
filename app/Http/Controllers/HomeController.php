@@ -28,7 +28,7 @@ class HomeController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
+    { 
         $user = Auth::user();
 
         $schedule = Repetition::where('user_id', '=', $user->id)
