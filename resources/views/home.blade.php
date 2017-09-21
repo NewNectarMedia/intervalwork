@@ -53,7 +53,7 @@
                         </div>
                     @endif
 
-                    <p><a href='{{url('api/ical', [$user->slug])}}' target="_blank">iCal url</a></p>
+                    <p><a href='{{url('api/ical', [$user->slug])}}' target="_blank">iCal url: </a>{{url('api/ical', [$user->slug])}}</p>
 
                     @if (count($schedule) > 0)
                     <div class="panel-body">
